@@ -1,4 +1,4 @@
-package Principal;
+package Entidades;
 
 import java.io.Serializable;
 
@@ -13,7 +13,8 @@ public class Cliente implements Comparable, Serializable {
     StringBuffer sb1 = new StringBuffer(50);
     StringBuffer sb2 = new StringBuffer(10);
 
-    public Cliente(){}
+    public Cliente() {
+    }
 
     public Cliente(String nombre, String apellido, String cif, int categoria, String direccion) {
         setNombre(nombre);
@@ -74,21 +75,14 @@ public class Cliente implements Comparable, Serializable {
 
     @Override
     public String toString() {
-        return "Cliente{" +
-                "nombre='" + nombre + '\'' +
-                ", apellido='" + apellido + '\'' +
-                ", cif='" + cif + '\'' +
-                ", categoria=" + categoria +
-                ", direccion='" + direccion + '\'' +
-                '}';
+        return "%S, %S, %S, %S, %S".formatted(nombre, apellido, cif, direccion, categoria);
     }
 
     @Override
     public int compareTo(Object o) {
         int salida = 0;
-        if (o instanceof Cliente){
-            Cliente cliente = (Cliente) o;
-            salida=this.cif.compareTo(cliente.cif);
+        if (o instanceof Cliente cliente) {
+            salida = this.cif.compareTo(cliente.cif);
         }
         return salida;
     }

@@ -1,11 +1,14 @@
-package Principal;
+package Controller;
+
+import Entidades.Cliente;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Scanner;
 
-public class GestionClientes {
+public class GestionClientes implements IGestionClientes{
 
 
     static Scanner sc = new Scanner(System.in);
@@ -41,7 +44,8 @@ public class GestionClientes {
     }
 
     /**
-     *
+     *  Método por el cual se registra un cliente el el lugar que corresponde en el fichero
+     *  de texto según su cif.
      * @param fichero
      * @param cliente
      * @param flag
@@ -73,7 +77,8 @@ public class GestionClientes {
     }
 
     /**
-     *
+     *  Método que crea un fichero nuevo donde aparezcan todas las altas que haya en
+     *  el fichero Clientes.txt
      * @param cliente
      * @param altas
      */
@@ -84,48 +89,62 @@ public class GestionClientes {
 
     /**
      * Método por el cual se mostrará el cliente que el usuario elija cuando el mismo
-     * pase por teclado el apellido del cliente.
+     * pase por parámetros el apellido del cliente.
      *
      * @param fichero
      * @param apellidos
      */
 
     public void consultarElementoPorApellidos(File fichero, String apellidos) {
-
-        try {
-            String apellido;
-            apellidos = apellidos + ",";
-            FileReader fr = new FileReader(fichero);
-            BufferedReader br = new BufferedReader(fr);
-            String linea = br.readLine();
+        String linea;
+        try (BufferedReader br = new BufferedReader(new FileReader(fichero))){
+            String[]lineaCliente;
+            linea = br.readLine();
             while (linea != null) {
-                sc = new Scanner(linea);
-                if (sc.hasNext()) {
-                    sc.next();
+                lineaCliente=linea.split(",");
+                if (Objects.equals(lineaCliente[2], apellidos)){
+                    System.out.println(linea);
                 }
-                if (sc.hasNext()) {
-                    apellido = sc.next();
-                    if (apellido.equals(apellidos)) {
-                        System.out.println(linea);
-                    }
-                }
-                linea = br.readLine();
-                System.out.println(linea);
+                linea= br.readLine();
             }
+            linea = br.readLine();
+            System.out.println(linea);
 
-        } catch (IOException e) {
-            System.out.println("Error!!" + e.getMessage());
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
         }
     }
 
+    /**
+     * Método por el cual se mostrarán los clientes que tengan el apellido pasado por
+     * parámetros
+     * @param fichero
+     * @param apellidos
+     * @return
+     */
+
     public String buscarElementoPorApellidos(File fichero, String apellidos) {
-        return "holi";
+
+
     }
 
+    /**
+     * Método por el cual se mostrará por pantalla el cliente con el cif pasado por
+     * parámetros
+     * @param fichero
+     * @param cif
+     */
     public void consultarElementoPorCif(File fichero, String cif) {
 
     }
 
+    /**
+     * Método por el cual se mostrará por pantalla el cliente con el cif pasado por
+     * parámetros
+     * @param fichero
+     * @param cif
+     * @return
+     */
     public String buscarElementoPorCif(File fichero, String cif) {
         return "holi";
     }

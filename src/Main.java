@@ -1,5 +1,5 @@
-import Principal.Cliente;
-import Principal.GestionClientes;
+import Entidades.Cliente;
+import Controller.GestionClientes;
 
 import java.io.File;
 
