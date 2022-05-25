@@ -7,7 +7,7 @@ public class Cliente implements Comparable, Serializable {
     private String nombre;
     private String apellido;
     private String cif;
-    private int categoría;
+    private int categoria;
     private String direccion;
 
     StringBuffer sb1 = new StringBuffer(50);
@@ -15,11 +15,11 @@ public class Cliente implements Comparable, Serializable {
 
     public Cliente(){}
 
-    public Cliente(String nombre, String apellido, String cif, int categoría, String direccion) {
+    public Cliente(String nombre, String apellido, String cif, int categoria, String direccion) {
         setNombre(nombre);
         setApellido(apellido);
         setCif(cif);
-        this.categoría = categoría;
+        this.categoria = categoria;
         setDireccion(direccion);
     }
 
@@ -54,12 +54,12 @@ public class Cliente implements Comparable, Serializable {
         sb2.setLength(0);
     }
 
-    public int getCategoría() {
-        return categoría;
+    public int getCategoria() {
+        return categoria;
     }
 
-    public void setCategoría(int categoría) {
-        this.categoría = categoría;
+    public void setCategoria(int categoria) {
+        this.categoria = categoria;
     }
 
     public String getDireccion() {
@@ -78,7 +78,7 @@ public class Cliente implements Comparable, Serializable {
                 "nombre='" + nombre + '\'' +
                 ", apellido='" + apellido + '\'' +
                 ", cif='" + cif + '\'' +
-                ", categoría=" + categoría +
+                ", categoria=" + categoria +
                 ", direccion='" + direccion + '\'' +
                 '}';
     }
