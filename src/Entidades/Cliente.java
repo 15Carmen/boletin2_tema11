@@ -75,7 +75,7 @@ public class Cliente implements Comparable, Serializable {
 
     @Override
     public String toString() {
-        return "%S, %S, %S, %S, %S".formatted(nombre, apellido, cif, direccion, categoria);
+        return String.format( "%S,%S,%S,%S,%S",nombre, apellido, cif, categoria,direccion);
     }
 
     @Override

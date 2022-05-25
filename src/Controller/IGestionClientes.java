@@ -3,11 +3,13 @@ package Controller;
 import Entidades.Cliente;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 public interface IGestionClientes {
     void altaCliente(File fichero, Cliente cliente);
 
-    void altaClienteOrdenado(File fichero, Cliente cliente, boolean flag);
+    void altaClienteOrdenado(File fichero, Cliente cliente);
 
     void realizarAltas(File cliente, File altas);
 
@@ -19,7 +21,7 @@ public interface IGestionClientes {
 
     String buscarElementoPorCif(File fichero, String cif);
 
-    void insertarModificacionCliente(File fichero, Cliente cliente);
+    void insertarModificacionCliente(File ficheroModificado, Cliente cliente);
 
     void realizarModificaciones(File clientes, File modificaciones);
 

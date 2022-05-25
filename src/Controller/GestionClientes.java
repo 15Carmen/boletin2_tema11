@@ -3,16 +3,15 @@ package Controller;
 import Entidades.Cliente;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 public class GestionClientes implements IGestionClientes{
 
+    public static final String FILE = "Clientes.txt";
+    public static final String AUX = "aux.txt";
+    public static final String MODIFICACIONES = "modificaciones.txt";
 
-    static Scanner sc = new Scanner(System.in);
-    public boolean append = false;
+
 
     /**
      * Metodo que registrará un cliente en el final del fichero CLIENTE.txt
@@ -23,19 +22,10 @@ public class GestionClientes implements IGestionClientes{
 
     public void altaCliente(File fichero, Cliente cliente) {
 
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(fichero, true));
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fichero, true))){
 
-            bw.write(cliente.getCif() + ",");
-            bw.write(cliente.getNombre() + ",");
-            bw.write(cliente.getApellido() + ",");
-            bw.write(cliente.getCategoria() + ",");
-            bw.write(cliente.getDireccion());
+            bw.write(cliente.toString());
             bw.newLine();
-
-            System.out.println(cliente.toString());
-
-            bw.close();
 
         } catch (Exception e) {
             System.out.println("Error al crear el fichero" + e.getMessage());
@@ -48,31 +38,32 @@ public class GestionClientes implements IGestionClientes{
      *  de texto según su cif.
      * @param fichero
      * @param cliente
-     * @param flag
      */
 
-    public void altaClienteOrdenado(File fichero, Cliente cliente, boolean flag) {
+    public void altaClienteOrdenado(File fichero, Cliente cliente) {
+        String linea;
+        Cliente cliente1;
+        boolean encontrado= false;
+        File aux=null;
+        try (BufferedReader br = new BufferedReader(new FileReader(fichero))){
+            aux = new File(AUX);
+            linea = br.readLine();
 
-        try {
-            BufferedWriter bw = null;
-
-            if (flag) {
-                bw = new BufferedWriter(new FileWriter(fichero, true));
-            } else {
-                bw = new BufferedWriter(new FileWriter(fichero));
+            while (linea != null){
+                cliente1 = transformarAObjeto(linea);
+                if (encontrado || cliente1.compareTo(cliente) <=0){
+                    altaCliente(aux, cliente1);
+                    linea = br.readLine();
+                }else {
+                    altaCliente(aux, cliente);
+                    encontrado=true;
+                }
             }
-            bw.write(cliente.getCif() + ",");
-            bw.write(cliente.getNombre() + ",");
-            bw.write(cliente.getApellido() + ",");
-            bw.write(cliente.getCategoria() + ",");
-            bw.write(cliente.getDireccion());
-            bw.newLine();
-
-            System.out.println(cliente.toString());
-            bw.close();
-
         } catch (Exception e) {
             System.out.println("Error al crear el fichero" + e.getMessage());
+        }finally {
+            fichero.delete();
+            aux.renameTo(fichero);
         }
     }
 
@@ -97,21 +88,25 @@ public class GestionClientes implements IGestionClientes{
 
     public void consultarElementoPorApellidos(File fichero, String apellidos) {
         String linea;
+        String salida= "Fichero no encontrado";
+        boolean salir=false;
+
         try (BufferedReader br = new BufferedReader(new FileReader(fichero))){
-            String[]lineaCliente;
+            String[] lineaCliente;
             linea = br.readLine();
-            while (linea != null) {
+            while (linea != null || !salir) {
                 lineaCliente=linea.split(",");
                 if (Objects.equals(lineaCliente[2], apellidos)){
-                    System.out.println(linea);
+                   salida=linea;
+                   salir=true;
+                }else {
+                    linea= br.readLine();
                 }
-                linea= br.readLine();
             }
-            linea = br.readLine();
-            System.out.println(linea);
+            System.out.println(salida);
 
         } catch (IOException ioException) {
-            ioException.printStackTrace();
+            System.out.println("Error al crear el fichero"+ ioException.getMessage());
         }
     }
 
@@ -125,6 +120,23 @@ public class GestionClientes implements IGestionClientes{
 
     public String buscarElementoPorApellidos(File fichero, String apellidos) {
 
+        String linea = "Fichero no encontrado";
+        boolean salir = false;
+        try (BufferedReader br = new BufferedReader(new FileReader(fichero))) {
+            String[] lineaCliente;
+            linea = br.readLine();
+            while (linea != null || !salir) {
+                lineaCliente = linea.split(",");
+                if (Objects.equals(lineaCliente[2], apellidos)) {
+                    salir = true;
+                } else {
+                    linea = br.readLine();
+                }
+            }
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+        return linea;
 
     }
 
@@ -149,30 +161,83 @@ public class GestionClientes implements IGestionClientes{
         return "holi";
     }
 
-    public void insertarModificacionCliente(File fichero, Cliente cliente) {
+    /**
+     * Método que inserta en un nuevo fichero de modificaciones un cliente para ser modificado en un futuro
+     * sobre el fichero original 'Clientes.txt'
+     * @param ficheroModificado
+     * @param cliente
+     */
 
+    public void insertarModificacionCliente(File ficheroModificado, Cliente cliente) {
+        altaCliente(ficheroModificado, cliente);
     }
 
+
+    /**
+     * Método que recoge todas las modificaciones del fichero modificaciones registradas
+     * en el fichero de modificaciones
+     * @param clientes
+     * @param modificaciones
+     */
     public void realizarModificaciones(File clientes, File modificaciones) {
 
+        String linea;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(modificaciones))) {
+
+            String[] lineaCliente;
+            linea = br.readLine();
+
+            while (linea != null) {
+                altaCliente(clientes,transformarAObjeto(linea));
+            }
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
     }
 
+    /**
+     * Método por el cual se modifica un elemento del fichero directamente
+     * con ayuda de un fichero auxiliar
+     * @param fichero
+     * @param registroViejo
+     * @param registroNuevo
+     */
     public void modificarElemento(File fichero, String registroViejo, Cliente registroNuevo) {
 
     }
 
+    /**
+     * Método que inserta en el fichero de bajas un cliente para ser
+     * dado de baja en un futuro sobre el fichero original de clientes. No se valida que el cliente
+     * exista en el fichero maestro
+     * @param fichero
+     * @param cli
+     */
     public void insertarBajaClientes(File fichero, Cliente cli) {
 
     }
 
+    /**
+     * Método que inserta en el fichero de bajas un cliente para ser
+     * dado de baja en un futuro sobre el fichero original de clientes. No se valida que el cliente
+     * exista en el fichero maestro
+     * @param clientes
+     * @param bajas
+     */
     public void realizarBajas(File clientes, File bajas) {
 
     }
 
+    /**
+     * Método que borra del fichero un elemento directamente con ayuda
+     * de un fichero auxiliar.
+     * @param fichero
+     * @param registro
+     */
     public void bajaElemento(File fichero, String registro) {
 
     }
-
 
     /**
      * Metodo que transforma un registro cliente que es un String a un objeto cliente
@@ -196,29 +261,7 @@ public class GestionClientes implements IGestionClientes{
 
     public void ordenarFichero(File fichero) {
 
-        ArrayList<Cliente> clientes = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(fichero))) {
-
-            String linea = br.readLine();
-            while (linea != null) {
-                clientes.add(transformarAObjeto(linea));
-                linea = br.readLine();
-            }
-            br.close();
-            System.out.println("cierra archivo");
-
-            Collections.sort(clientes, Cliente::compareTo);
-
-            this.append = false;
-            for (int i = 0; i < clientes.size(); i++) {
-                System.out.println(clientes.get(i).toString());
-                if (i > 0) {
-                    this.append = true;
-                }
-
-                altaClienteOrdenado(fichero, clientes.get(i), this.append);
-            }
+        try (BufferedReader br = new BufferedReader(new FileReader(fichero))){
 
         } catch (Exception e) {
             System.out.println("Error");
